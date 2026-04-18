@@ -163,6 +163,6 @@ async def 강화(ctx):
 
     await ctx.send(msg)
 
-# ===== 실행 =====
+# ▶ 실행
 keep_alive()
 bot.run(os.getenv("DISCORD_TOKEN"))

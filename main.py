@@ -165,4 +165,4 @@ async def 강화(ctx):
 
 # ===== 실행 =====
 keep_alive()
-bot.run(os.getenv("MTQ5..."))
+bot.run(os.getenv("DISCORD_TOKEN"))

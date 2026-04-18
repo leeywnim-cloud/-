@@ -160,4 +160,4 @@ def keep_alive():
 
 keep_alive()
 # ===== 실행 =====
-bot.run(os.getenv("MTQ5MzkyNDUyMTc1NTkzNDc4MA.GmGryb.XhjB8OSTIv7LbPJjV3lwvlEKKQPQCnbc8H6kjk")
+bot.run(os.getenv("DISCORD_TOKEN"))

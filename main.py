@@ -167,7 +167,7 @@ async def 강화(ctx):
 # ▶ 실행
 if __name__ == "__main__":
     token = os.getenv("DISCORD_TOKEN")
-    
+
     if token is None:
         print("토큰 없음")
     else:

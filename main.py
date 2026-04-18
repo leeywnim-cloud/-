@@ -171,7 +171,7 @@ if __name__ == "__main__":
     token = os.getenv("DISCORD_TOKEN")
 
     if token is None:
-        print("토큰 없음")
+        print("TOKEN:", os.getenv("DISCORD_TOKEN"))
     else:
         keep_alive()
         bot.run(token)

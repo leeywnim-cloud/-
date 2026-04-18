@@ -32,8 +32,6 @@ tree = bot.tree
 DATA_FILE = "data.json"
 cooldowns = {}
 
-CHEF_ROLE_ID = 123456789012345678  # 👉 본인 역할 ID 넣기
-
 # ===== 데이터 =====
 def load_data():
     if not os.path.exists(DATA_FILE):
@@ -107,10 +105,11 @@ async def 출석(ctx):
     u = get_user(d, ctx.author.id)
 
     today = str(datetime.date.today())
+
     if u.get("last") == today:
         return await ctx.send("❌ 이미 출석")
 
-    r = random.randint(100,300)
+    r = random.randint(100, 300)
     u["money"] += r
     u["last"] = today
 
@@ -119,18 +118,18 @@ async def 출석(ctx):
 
 # ===== 슬롯 =====
 @bot.command()
-async def 슬롯(ctx, a:int):
+async def 슬롯(ctx, a: int):
     d = load_data()
     u = get_user(d, ctx.author.id)
 
-    if not cd(ctx.author.id,5):
+    if not cd(ctx.author.id, 5):
         return await ctx.send("⏱")
 
     if a <= 0 or u["money"] < a:
         return await ctx.send("돈 부족")
 
-    s=["🍒","🍋","🔔","💎","7️⃣"]
-    r=[random.choice(s) for _ in range(3)]
+    s = ["🍒", "🍋", "🔔", "💎", "7️⃣"]
+    r = [random.choice(s) for _ in range(3)]
 
     if r.count(r[0]) == 3:
         w = a * 5
@@ -149,31 +148,30 @@ async def 강화(ctx):
     d = load_data()
     u = get_user(d, ctx.author.id)
 
-    cost = (u["enhance"]+1)*200
+    cost = (u["enhance"] + 1) * 200
+
     if u["money"] < cost:
         return await ctx.send("돈 부족")
 
-    success = random.randint(1,100) <= 50
+    success = random.randint(1, 100) <= 50
 
     if success:
         u["enhance"] += 1
         msg = f"🔥 성공! +{u['enhance']}"
     else:
-        u["enhance"] = max(0, u["enhance"]-1)
+        u["enhance"] = max(0, u["enhance"] - 1)
         msg = "💥 실패..."
 
     u["money"] -= cost
     save_data(d)
-
     await ctx.send(msg)
 
-# ▶ 실행
+# ===== 실행 =====
 if __name__ == "__main__":
     token = os.getenv("DISCORD_TOKEN")
 
     if token is None:
-        print("토큰 없음")    if token is None:
-    print("토큰 없음")
+        print("토큰 없음")
     else:
         keep_alive()
         bot.run(token)

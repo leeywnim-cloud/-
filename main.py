@@ -142,6 +142,22 @@ async def 주문(ctx, *, item:str):
         f"🍽️ {ctx.author.mention} 주문: {item}\n💰 -{cost}\n{role.mention}",
         allowed_mentions=discord.AllowedMentions(roles=True)
     )
+from flask import Flask
+import threading
 
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "alive"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    t = threading.Thread(target=run)
+    t.start()
+
+keep_alive()
 # ===== 실행 =====
 bot.run(os.getenv("MTQ5MzkyNDUyMTc1NTkzNDc4MA.GmGryb.XhjB8OSTIv7LbPJjV3lwvlEKKQPQCnbc8H6kjk")

@@ -164,11 +164,14 @@ async def 강화(ctx):
     await ctx.send(msg)
 
 # ▶ 실행
-keep_alive()
+import os
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+# ... 위 코드들 그대로 두고
 
-if TOKEN is None:
-    print("❌ DISCORD_TOKEN 없음")
-else:
-bot.run(os.getenv("DISCORD_TOKEN"))
+if __name__ == "__main__":
+    token = os.getenv("DISCORD_TOKEN")
+
+    if token is None:
+        print("토큰 없음")
+    else:
+        bot.run(token)

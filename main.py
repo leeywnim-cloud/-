@@ -2,8 +2,23 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import random, json, os, time, datetime
+from flask import Flask
+from threading import Thread
 
-# ===== 기본 설정 =====
+# ===== 서버 유지 =====
+app = Flask('')
+
+@app.route('/')
+def home():
+    return "alive"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+def keep_alive():
+    Thread(target=run).start()
+
+# ===== 설정 =====
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -12,7 +27,8 @@ tree = bot.tree
 
 DATA_FILE = "data.json"
 cooldowns = {}
-CHEF_ROLE_ID = 123456789012345678  # ← 셰프 역할 ID 넣기
+
+CHEF_ROLE_ID = 123456789012345678  # 👉 본인 역할 ID 넣기
 
 # ===== 데이터 =====
 def load_data():
@@ -29,10 +45,10 @@ def get_user(data, uid):
     uid = str(uid)
     if uid not in data:
         data[uid] = {
-            "money":1000,
-            "xp":0,
-            "level":1,
-            "enhance":0
+            "money": 1000,
+            "xp": 0,
+            "level": 1,
+            "enhance": 0
         }
     return data[uid]
 
@@ -43,7 +59,7 @@ def cd(uid, sec):
     cooldowns[uid] = now
     return True
 
-# ===== 실행 =====
+# ===== 봇 시작 =====
 @bot.event
 async def on_ready():
     await tree.sync()
@@ -59,15 +75,16 @@ async def on_message(message):
     u = get_user(d, message.author.id)
 
     u["xp"] += 10
+    need = u["level"] * 100
 
-    if u["xp"] >= u["level"] * 100:
-        u["xp"] = 0
+    if u["xp"] >= need:
+        u["xp"] -= need
         u["level"] += 1
         reward = u["level"] * 100
         u["money"] += reward
 
         await message.channel.send(
-            f"🎉 {message.author.mention} Lv.{u['level']}!\n💰 +{reward}"
+            f"🎉 {message.author.mention} 레벨업! Lv.{u['level']}\n💰 +{reward}"
         )
 
     save_data(d)
@@ -77,7 +94,7 @@ async def on_message(message):
 @bot.command()
 async def 지갑(ctx):
     u = get_user(load_data(), ctx.author.id)
-    await ctx.send(f"💰 {u['money']}")
+    await ctx.send(f"💰 {u['money']}코인")
 
 # ===== 출석 =====
 @bot.command()
@@ -103,61 +120,49 @@ async def 슬롯(ctx, a:int):
     u = get_user(d, ctx.author.id)
 
     if not cd(ctx.author.id,5):
-        return await ctx.send("⏱ 쿨타임")
+        return await ctx.send("⏱")
 
-    if a<=0 or u["money"]<a:
+    if a <= 0 or u["money"] < a:
         return await ctx.send("돈 부족")
 
-    s=["🍒","🍋","🔔"]
+    s=["🍒","🍋","🔔","💎","7️⃣"]
     r=[random.choice(s) for _ in range(3)]
 
-    if r.count(r[0])==3:
-        win=a*3
-        u["money"]+=win
-        msg=f"🔥 +{win}"
+    if r.count(r[0]) == 3:
+        w = a * 5
+        u["money"] += w
+        msg = f"🔥 +{w}"
     else:
-        u["money"]-=a
-        msg=f"🔴 -{a}"
+        u["money"] -= a
+        msg = f"🔴 -{a}"
 
     save_data(d)
-    await ctx.send(f"{r}\n{msg}")
+    await ctx.send(f"{'|'.join(r)}\n{msg}")
 
-# ===== 주문 (셰프 멘션) =====
+# ===== 강화 =====
 @bot.command()
-async def 주문(ctx, *, item:str):
+async def 강화(ctx):
     d = load_data()
     u = get_user(d, ctx.author.id)
 
-    cost = random.randint(100,300)
-
+    cost = (u["enhance"]+1)*200
     if u["money"] < cost:
         return await ctx.send("돈 부족")
+
+    success = random.randint(1,100) <= 50
+
+    if success:
+        u["enhance"] += 1
+        msg = f"🔥 성공! +{u['enhance']}"
+    else:
+        u["enhance"] = max(0, u["enhance"]-1)
+        msg = "💥 실패..."
 
     u["money"] -= cost
     save_data(d)
 
-    role = ctx.guild.get_role(CHEF_ROLE_ID)
+    await ctx.send(msg)
 
-    await ctx.send(
-        f"🍽️ {ctx.author.mention} 주문: {item}\n💰 -{cost}\n{role.mention}",
-        allowed_mentions=discord.AllowedMentions(roles=True)
-    )
-from flask import Flask
-import threading
-
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "alive"
-
-def run():
-    app.run(host='0.0.0.0', port=8080)
-
-def keep_alive():
-    t = threading.Thread(target=run)
-    t.start()
-
-keep_alive()
 # ===== 실행 =====
+keep_alive()
 bot.run(os.getenv("DISCORD_TOKEN"))

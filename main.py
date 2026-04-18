@@ -144,4 +144,4 @@ async def 주문(ctx, *, item:str):
     )
 
 # ===== 실행 =====
-bot.run(os.getenv("MTQ5MzkyNDUyMTc1NTkzNDc4MA.G86-Cv.mrpSxENwWojhHX__dZQRe_U_BdgiUMVzfzdHMg")
+bot.run(os.getenv("MTQ5MzkyNDUyMTc1NTkzNDc4MA.GmGryb.XhjB8OSTIv7LbPJjV3lwvlEKKQPQCnbc8H6kjk")

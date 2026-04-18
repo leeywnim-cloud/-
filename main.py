@@ -49,7 +49,7 @@ async def on_ready():
     await tree.sync()
     print("봇 ON")
 
-# ===== 경험치 + 명령어 =====
+# ===== 경험치 =====
 @bot.event
 async def on_message(message):
     if message.author.bot:
@@ -79,11 +79,6 @@ async def 지갑(ctx):
     u = get_user(load_data(), ctx.author.id)
     await ctx.send(f"💰 {u['money']}")
 
-@tree.command(name="지갑")
-async def wallet(i: discord.Interaction):
-    u = get_user(load_data(), i.user.id)
-    await i.response.send_message(f"💰 {u['money']}")
-
 # ===== 출석 =====
 @bot.command()
 async def 출석(ctx):
@@ -100,22 +95,6 @@ async def 출석(ctx):
 
     save_data(d)
     await ctx.send(f"✅ +{r}")
-
-@tree.command(name="출석")
-async def slash_att(i: discord.Interaction):
-    d = load_data()
-    u = get_user(d, i.user.id)
-
-    today = str(datetime.date.today())
-    if u.get("last") == today:
-        return await i.response.send_message("❌ 이미 출석")
-
-    r = random.randint(100,300)
-    u["money"] += r
-    u["last"] = today
-
-    save_data(d)
-    await i.response.send_message(f"✅ +{r}")
 
 # ===== 슬롯 =====
 @bot.command()
@@ -143,74 +122,6 @@ async def 슬롯(ctx, a:int):
     save_data(d)
     await ctx.send(f"{r}\n{msg}")
 
-# ===== 강화 =====
-@bot.command()
-async def 강화(ctx):
-    d = load_data()
-    u = get_user(d, ctx.author.id)
-
-    cost = (u["enhance"]+1)*200
-
-    if u["money"] < cost:
-        return await ctx.send("돈 부족")
-
-    if random.random() < 0.5:
-        u["enhance"] += 1
-        msg = f"🔥 성공! +{u['enhance']}"
-    else:
-        u["enhance"] = 0
-        msg = "💀 터짐"
-
-    u["money"] -= cost
-    save_data(d)
-    await ctx.send(msg)
-
-@tree.command(name="강화")
-async def slash_enhance(i: discord.Interaction):
-    d = load_data()
-    u = get_user(d, i.user.id)
-
-    cost = (u["enhance"]+1)*200
-
-    if u["money"] < cost:
-        return await i.response.send_message("돈 부족")
-
-    if random.random() < 0.5:
-        u["enhance"] += 1
-        msg = f"🔥 성공! +{u['enhance']}"
-    else:
-        u["enhance"] = 0
-        msg = "💀 터짐"
-
-    u["money"] -= cost
-    save_data(d)
-    await i.response.send_message(msg)
-
-# ===== 랭킹 =====
-@bot.command()
-async def 랭킹(ctx):
-    d = load_data()
-    s = sorted(d.items(), key=lambda x:x[1]["money"], reverse=True)
-
-    msg="🏆 돈 랭킹\n"
-    for i,(uid,data) in enumerate(s[:5],1):
-        user = await bot.fetch_user(int(uid))
-        msg += f"{i}. {user.name} - {data['money']}\n"
-
-    await ctx.send(msg)
-
-@tree.command(name="랭킹")
-async def slash_rank(i: discord.Interaction):
-    d = load_data()
-    s = sorted(d.items(), key=lambda x:x[1]["money"], reverse=True)
-
-    msg="🏆 돈 랭킹\n"
-    for idx,(uid,data) in enumerate(s[:5],1):
-        user = await bot.fetch_user(int(uid))
-        msg += f"{idx}. {user.name} - {data['money']}\n"
-
-    await i.response.send_message(msg)
-
 # ===== 주문 (셰프 멘션) =====
 @bot.command()
 async def 주문(ctx, *, item:str):
@@ -232,26 +143,5 @@ async def 주문(ctx, *, item:str):
         allowed_mentions=discord.AllowedMentions(roles=True)
     )
 
-@tree.command(name="주문")
-@app_commands.describe(아이템="주문할 것")
-async def slash_order(i: discord.Interaction, 아이템:str):
-    d = load_data()
-    u = get_user(d, i.user.id)
-
-    cost = random.randint(100,300)
-
-    if u["money"] < cost:
-        return await i.response.send_message("돈 부족")
-
-    u["money"] -= cost
-    save_data(d)
-
-    role = i.guild.get_role(CHEF_ROLE_ID)
-
-    await i.response.send_message(
-        f"🍽️ {i.user.mention} 주문: {아이템}\n💰 -{cost}\n{role.mention}",
-        allowed_mentions=discord.AllowedMentions(roles=True)
-    )
-
 # ===== 실행 =====
-bot.run("여기에_토큰")
+bot.run(os.getenv("MTQ5MzkyNDUyMTc1NTkzNDc4MA.G86-Cv.mrpSxENwWojhHX__dZQRe_U_BdgiUMVzfzdHMg")

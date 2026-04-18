@@ -171,4 +171,4 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 if TOKEN is None:
     print("❌ DISCORD_TOKEN 없음")
 else:
-    bot.run(TOKEN)
+bot.run(os.getenv("DISCORD_TOKEN"))

@@ -2,7 +2,7 @@ import os
 import discord
 from discord.ext import commands
 from discord import app_commands
-import random, json, os, time, datetime
+import random, json, time, datetime
 from flask import Flask
 from threading import Thread
 
